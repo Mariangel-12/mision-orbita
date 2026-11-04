@@ -33,3 +33,16 @@ puntos_cientificos = 0
 actividades_realizadas = 0
 muestras_recolectadas = 0
 continuar_exploracion = True
+# --- Ciclo del menú: se repite mientras la exploración pueda continuar ---
+while continuar_exploracion:
+    print("1. Analizar terreno")
+    print("2. Recolectar muestra")
+    print("3. Realizar observación")
+    print("4. Finalizar exploración")
+    opcion = int(input("Seleccione una actividad: "))
+
+    if opcion == OPCION_FINALIZAR:
+        print("Exploración finalizada por la tripulación.")
+        continuar_exploracion = False
+    else:
+        print("Opción no válida.")
