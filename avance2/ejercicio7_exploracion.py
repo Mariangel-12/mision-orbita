@@ -77,4 +77,11 @@ while continuar_exploracion:
             print("Recursos insuficientes para realizar la actividad. La exploración finaliza.")
             continuar_exploracion = False
     else:
-        print("Opción no válida.")      
+        print("Opción no válida.")   
+
+# --- Salida de resultados: resumen de la exploración ---
+print("Actividades realizadas:", actividades_realizadas)
+print("Muestras recolectadas:", muestras_recolectadas)
+print("Puntos científicos:", puntos_cientificos)
+print("Energía restante:", energia_disponible, "unidades")
+print("Provisiones restantes:", provisiones_disponibles, "unidades")  
