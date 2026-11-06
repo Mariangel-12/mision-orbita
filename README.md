@@ -10,11 +10,21 @@ soporte para la tripulación y autorización de lanzamiento.
 - Mariangel Marin Chinchilla
 
 ## Estructura del proyecto
+
+### Avance 1
 - avance1/ejercicio1_recursos.py
 - avance1/ejercicio2_combustible.py
 - avance1/ejercicio3_soporte_tripulacion.py
 - avance1/ejercicio4_autorizacion.py
-- documentacion/avance1.pdf
+
+### Avance 2
+- avance2/ejercicio7_exploracion.py
+- avance2/ejercicio8_regreso.py
+
+### Documentación
+- documentación/avance1.pdf
+- documentación/ejercicio7_exploracion.pdf
+- documentación/ejercicio8_regreso.pdf
 
 ## Instrucciones para ejecutar
 1. Instalar Python 3.
