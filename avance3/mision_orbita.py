@@ -127,13 +127,83 @@ def autorizar_lanzamiento(disponibles, requeridos):
             autorizado = False
     return autorizado
 
-# Prueba temporal del componente A (se reemplaza al terminar el sistema)
+# ============================================================
+# COMPONENTE B: Viaje de ida
+# ============================================================
+
+# Consumo de un día de viaje, en el orden de RECURSOS
+def calcular_consumo_diario(tripulantes):
+    consumo_combustible = CONSUMO_COMBUSTIBLE_DIA
+    consumo_oxigeno = tripulantes * CONSUMO_OXIGENO_TRIPULANTE_DIA
+    consumo_energia = CONSUMO_ENERGIA_DIA
+    consumo_provisiones = tripulantes * CONSUMO_PROVISIONES_TRIPULANTE_DIA
+    consumo = [consumo_combustible, consumo_oxigeno, consumo_energia, consumo_provisiones]
+    return consumo
+
+
+# Resta a cada recurso su consumo diario multiplicado por los días del viaje.
+# Como la misión ya fue autorizada, los recursos siempre alcanzan.
+def viajar_al_destino(recursos, dias_viaje, tripulantes):
+    consumo = calcular_consumo_diario(tripulantes)
+    for posicion in range(len(RECURSOS)):
+        recursos[posicion] = recursos[posicion] - consumo[posicion] * dias_viaje
+    return recursos
+
+
+# Devuelve True solo si cada recurso cubre el consumo de un día
+def recursos_alcanzan(recursos, consumo):
+    alcanzan = True
+    for posicion in range(len(RECURSOS)):
+        if recursos[posicion] < consumo[posicion]:
+            alcanzan = False
+    return alcanzan
+
+
+# Simula el trayecto día a día. Se detiene si algún recurso no alcanza
+# y devuelve los días completados. Los mensajes de llegada o interrupción
+# los muestra la función que la llama.
+def simular_trayecto(recursos, dias, tripulantes):
+    consumo = calcular_consumo_diario(tripulantes)
+    dias_completados = 0
+    puede_continuar = True
+
+    while dias_completados < dias and puede_continuar:
+        if recursos_alcanzan(recursos, consumo):
+            for posicion in range(len(RECURSOS)):
+                recursos[posicion] = recursos[posicion] - consumo[posicion]
+            dias_completados = dias_completados + 1
+            print("Día " + str(dias_completados)
+                  + " | Combustible: " + str(recursos[COMBUSTIBLE])
+                  + " | Oxígeno: " + str(recursos[OXIGENO])
+                  + " | Energía: " + str(recursos[ENERGIA])
+                  + " | Provisiones: " + str(recursos[PROVISIONES]))
+        else:
+            # No se descuenta nada ese día y el ciclo termina por su condición
+            puede_continuar = False
+
+    return dias_completados
+
+
+# Muestra la cantidad restante de cada recurso
+def mostrar_recursos(recursos):
+    print("Recursos restantes:")
+    for posicion in range(len(RECURSOS)):
+        print("- " + RECURSOS[posicion].capitalize() + ": " + str(recursos[posicion]) + " unidades")
+
+# Prueba temporal de los componentes A y B (se reemplaza al terminar el sistema)
 def main():
-    mostrar_destinos()
-    recursos = leer_recursos()
-    requeridos = calcular_requeridos(3, 2)
-    mostrar_resumen("Explorador I", "Luna", 3, 2, recursos, requeridos)
-    print(autorizar_lanzamiento(recursos, requeridos))
+    recursos = [70, 30, 45, 16]
+    recursos = viajar_al_destino(recursos, 3, 2)
+    mostrar_recursos(recursos)
+
+    recursos = [70, 30, 45, 16]
+    dias = simular_trayecto(recursos, 3, 2)
+    print("Días completados:", dias)
+    mostrar_recursos(recursos)
+
+    recursos = [20, 20, 12, 10]
+    dias = simular_trayecto(recursos, 3, 2)
+    print("Días completados:", dias)
 
 
 main()
