@@ -65,3 +65,75 @@ MARGEN_MINIMO_COMBUSTIBLE = 10
 OPCION_PLANIFICAR = 1
 OPCION_HISTORIAL = 2
 OPCION_SALIR = 3
+
+# ============================================================
+# COMPONENTE A: Preparación y autorización
+# ============================================================
+
+# Muestra los destinos numerados a partir de 1, recorriendo la tupla DESTINOS
+def mostrar_destinos():
+    print("Destinos disponibles:")
+    numero = 1
+    for destino in DESTINOS:
+        print(str(numero) + ". " + destino[DES_NOMBRE] + " (" + str(destino[DES_DIAS]) + " días)")
+        numero = numero + 1
+
+
+# Pide la cantidad disponible de cada recurso, en el orden de RECURSOS
+def leer_recursos():
+    recursos = []
+    for recurso in RECURSOS:
+        cantidad = int(input("Cantidad disponible de " + recurso + ": "))
+        recursos.append(cantidad)
+    return recursos
+
+
+# Calcula lo que la misión necesita para ida, regreso y reservas
+def calcular_requeridos(dias_viaje, tripulantes):
+    combustible_requerido = dias_viaje * CONSUMO_COMBUSTIBLE_DIA * TRAMOS_VIAJE + RESERVA_COMBUSTIBLE
+    oxigeno_requerido = (dias_viaje * CONSUMO_OXIGENO_TRIPULANTE_DIA * TRAMOS_VIAJE
+                         * tripulantes + RESERVA_OXIGENO)
+    energia_requerida = dias_viaje * CONSUMO_ENERGIA_DIA * TRAMOS_VIAJE + ENERGIA_EXPLORACION
+    provisiones_requeridas = (dias_viaje * CONSUMO_PROVISIONES_TRIPULANTE_DIA * tripulantes
+                              * TRAMOS_VIAJE + RESERVA_PROVISIONES)
+    requeridos = [combustible_requerido, oxigeno_requerido, energia_requerida, provisiones_requeridas]
+    return requeridos
+
+
+# Muestra el resumen de la misión y advierte si el margen de combustible es bajo
+def mostrar_resumen(nombre_mision, nombre_destino, dias_viaje, tripulantes, disponibles, requeridos):
+    print("Misión:", nombre_mision)
+    print("Destino:", nombre_destino)
+    print("Duración del viaje de ida:", dias_viaje, "días")
+    print("Tripulantes:", tripulantes)
+
+    posicion = 0
+    for recurso in RECURSOS:
+        print(recurso.capitalize() + ": disponible " + str(disponibles[posicion])
+              + " | requerido " + str(requeridos[posicion]))
+        posicion = posicion + 1
+
+    margen = disponibles[COMBUSTIBLE] - requeridos[COMBUSTIBLE]
+    print("Margen adicional de combustible:", margen, "unidades")
+    if margen < MARGEN_MINIMO_COMBUSTIBLE:
+        print("Advertencia: el margen adicional de combustible es bajo.")
+
+
+# Devuelve True solo si cada recurso disponible cubre su requerido
+def autorizar_lanzamiento(disponibles, requeridos):
+    autorizado = True
+    for posicion in range(len(RECURSOS)):
+        if disponibles[posicion] < requeridos[posicion]:
+            autorizado = False
+    return autorizado
+
+# Prueba temporal del componente A (se reemplaza al terminar el sistema)
+def main():
+    mostrar_destinos()
+    recursos = leer_recursos()
+    requeridos = calcular_requeridos(3, 2)
+    mostrar_resumen("Explorador I", "Luna", 3, 2, recursos, requeridos)
+    print(autorizar_lanzamiento(recursos, requeridos))
+
+
+main()
