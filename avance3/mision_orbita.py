@@ -190,20 +190,85 @@ def mostrar_recursos(recursos):
     for posicion in range(len(RECURSOS)):
         print("- " + RECURSOS[posicion].capitalize() + ": " + str(recursos[posicion]) + " unidades")
 
-# Prueba temporal de los componentes A y B (se reemplaza al terminar el sistema)
+# ============================================================
+# COMPONENTE C: Exploración con bitácora
+# ============================================================
+
+# Muestra las actividades numeradas y, al final, la opción para finalizar
+def mostrar_menu_actividades():
+    numero = 1
+    for actividad in ACTIVIDADES:
+        print(str(numero) + ". " + actividad[ACT_NOMBRE])
+        numero = numero + 1
+    print(str(len(ACTIVIDADES) + 1) + ". Finalizar exploración")
+
+
+# Cuenta cuántas veces aparece una actividad en la bitácora
+def contar_actividad(bitacora, nombre_actividad):
+    contador = 0
+    for fila in bitacora:
+        if fila[BIT_ACTIVIDAD] == nombre_actividad:
+            contador = contador + 1
+    return contador
+
+
+# Suma los puntos de todas las filas de la bitácora
+def calcular_puntos(bitacora):
+    total_puntos = 0
+    for fila in bitacora:
+        total_puntos = total_puntos + fila[BIT_PUNTOS]
+    return total_puntos
+
+
+# Repite el menú de actividades hasta que la tripulación finalice o falten recursos.
+# Modifica la lista recursos y devuelve la bitácora de actividades realizadas.
+def explorar(recursos):
+    print("=== EXPLORACIÓN ===")
+    bitacora = []
+    opcion_finalizar = len(ACTIVIDADES) + 1
+    continuar_exploracion = True
+
+    while continuar_exploracion:
+        mostrar_menu_actividades()
+        opcion = int(input("Seleccione una actividad: "))
+
+        if opcion == opcion_finalizar:
+            print("Exploración finalizada por la tripulación.")
+            continuar_exploracion = False
+        elif opcion >= 1 and opcion <= len(ACTIVIDADES):
+            actividad = ACTIVIDADES[opcion - 1]
+            # Se verifica que alcancen los tres recursos que consume la actividad
+            if (recursos[COMBUSTIBLE] >= actividad[ACT_COMBUSTIBLE]
+                    and recursos[ENERGIA] >= actividad[ACT_ENERGIA]
+                    and recursos[PROVISIONES] >= actividad[ACT_PROVISIONES]):
+                recursos[COMBUSTIBLE] = recursos[COMBUSTIBLE] - actividad[ACT_COMBUSTIBLE]
+                recursos[ENERGIA] = recursos[ENERGIA] - actividad[ACT_ENERGIA]
+                recursos[PROVISIONES] = recursos[PROVISIONES] - actividad[ACT_PROVISIONES]
+                # El número de la fila es la posición en que se realizó la actividad
+                bitacora.append([len(bitacora) + 1, actividad[ACT_NOMBRE], actividad[ACT_PUNTOS]])
+                print("Actividad realizada: " + actividad[ACT_NOMBRE]
+                      + ". Puntos obtenidos: " + str(actividad[ACT_PUNTOS]))
+            else:
+                print("Recursos insuficientes para realizar la actividad. La exploración finaliza.")
+                continuar_exploracion = False
+        else:
+            print("Opción no válida.")
+
+    return bitacora
+
+
+# Muestra el resumen de la exploración y los recursos que quedan
+def mostrar_resumen_exploracion(bitacora, recursos):
+    print("Actividades realizadas:", len(bitacora))
+    print("Muestras recolectadas:", contar_actividad(bitacora, "Recolectar muestra"))
+    print("Puntos científicos:", calcular_puntos(bitacora))
+    mostrar_recursos(recursos)
+
+# Prueba temporal del componente C (se reemplaza al terminar el sistema)
 def main():
-    recursos = [70, 30, 45, 16]
-    recursos = viajar_al_destino(recursos, 3, 2)
-    mostrar_recursos(recursos)
-
-    recursos = [70, 30, 45, 16]
-    dias = simular_trayecto(recursos, 3, 2)
-    print("Días completados:", dias)
-    mostrar_recursos(recursos)
-
-    recursos = [20, 20, 12, 10]
-    dias = simular_trayecto(recursos, 3, 2)
-    print("Días completados:", dias)
+    recursos = [46, 18, 30, 10]
+    bitacora = explorar(recursos)
+    mostrar_resumen_exploracion(bitacora, recursos)
 
 
 main()
