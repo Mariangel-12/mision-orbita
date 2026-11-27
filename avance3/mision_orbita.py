@@ -362,15 +362,113 @@ def mostrar_reporte(mision, bitacora):
             print("#" + str(fila[BIT_NUMERO]) + " " + fila[BIT_ACTIVIDAD]
                   + " - " + str(fila[BIT_PUNTOS]) + " puntos")
 
-# Prueba temporal del componente E (se reemplaza al terminar el sistema)
+# ============================================================
+# SISTEMA INTEGRADO: ejecutar una misión completa
+# ============================================================
+
+# Controla el ciclo completo de una misión, de la planificación al reporte final.
+# Devuelve la fila de la misión para guardarla en el historial.
+def ejecutar_mision(numero):
+    print("=== PLANIFICACIÓN ===")
+    nombre_mision = input("Nombre de la misión: ")
+    tripulantes = int(input("Cantidad de tripulantes: "))
+    mostrar_destinos()
+    opcion = int(input("Seleccione un destino: "))
+
+    bitacora = []
+    nombre_destino = "Ninguno"
+
+    if opcion < 1 or opcion > len(DESTINOS):
+        print("Opción de destino no válida. La misión no puede planificarse.")
+        resultado = RESULTADOS[4]
+    else:
+        destino = DESTINOS[opcion - 1]
+        nombre_destino = destino[DES_NOMBRE]
+        dias_viaje = destino[DES_DIAS]
+
+        recursos = leer_recursos()
+        requeridos = calcular_requeridos(dias_viaje, tripulantes)
+        mostrar_resumen(nombre_mision, nombre_destino, dias_viaje, tripulantes, recursos, requeridos)
+
+        if autorizar_lanzamiento(recursos, requeridos):
+            print("Lanzamiento autorizado.")
+            print("=== VIAJE DE IDA ===")
+            recursos = viajar_al_destino(recursos, dias_viaje, tripulantes)
+            print("La nave llegó a " + nombre_destino + " en " + str(dias_viaje) + " días.")
+            mostrar_recursos(recursos)
+            bitacora = explorar(recursos)
+            mostrar_resumen_exploracion(bitacora, recursos)
+            resultado = regresar(recursos, dias_viaje, tripulantes)
+        else:
+            print("Lanzamiento no autorizado. La misión debe ser revisada.")
+            resultado = RESULTADOS[3]
+
+    # Se arma la fila de la misión; si no hubo exploración, los puntos son 0
+    mision = [numero, nombre_mision, nombre_destino, resultado, calcular_puntos(bitacora)]
+    mostrar_reporte(mision, bitacora)
+    return mision
+
+
+# ============================================================
+# COMPONENTE F: Menú principal e historial de misiones
+# ============================================================
+
+def mostrar_menu_principal():
+    print("===== MISIÓN ÓRBITA =====")
+    print("1. Planificar y ejecutar una misión")
+    print("2. Ver historial de misiones")
+    print("3. Salir")
+
+
+# Devuelve los puntos de una fila del historial; sirve como criterio de orden
+def obtener_puntos_mision(mision):
+    puntos = mision[MIS_PUNTOS]
+    return puntos
+
+
+# Devuelve una matriz nueva ordenada de mayor a menor puntaje; el historial no cambia
+def ordenar_historial(historial):
+    historial_ordenado = sorted(historial, key=obtener_puntos_mision, reverse=True)
+    return historial_ordenado
+
+
+# Devuelve el texto de una línea del historial
+def linea_mision(mision):
+    linea = ("#" + str(mision[MIS_NUMERO]) + " " + mision[MIS_NOMBRE]
+             + " | " + mision[MIS_DESTINO] + " | " + mision[MIS_RESULTADO]
+             + " | " + str(mision[MIS_PUNTOS]) + " puntos")
+    return linea
+
+
+def mostrar_historial(historial):
+    print("=== HISTORIAL DE MISIONES ===")
+    if len(historial) == 0:
+        print("No hay misiones registradas.")
+    else:
+        for mision in ordenar_historial(historial):
+            print(linea_mision(mision))
+
+
+# Programa principal: repite el menú hasta que el usuario elija salir
 def main():
-    bitacora = [[1, "Analizar terreno", 10], [2, "Recolectar muestra", 20]]
-    mostrar_reporte([1, "Explorador II", "Luna", "Regreso interrumpido", 30], bitacora)
+    historial = []
+    continuar_sistema = True
 
-    bitacora = [[1, "Sobrevolar la zona", 25], [2, "Sobrevolar la zona", 25]]
-    mostrar_reporte([2, "Explorador III", "Luna", "Tripulación varada", 50], bitacora)
+    while continuar_sistema:
+        mostrar_menu_principal()
+        opcion = int(input("Seleccione una opción: "))
 
-    mostrar_reporte([3, "Explorador IV", "Luna", "No autorizada", 0], [])
+        if opcion == OPCION_PLANIFICAR:
+            mision = ejecutar_mision(len(historial) + 1)
+            historial.append(mision)
+        elif opcion == OPCION_HISTORIAL:
+            mostrar_historial(historial)
+        elif opcion == OPCION_SALIR:
+            continuar_sistema = False
+        else:
+            print("Opción no válida.")
+
+    print("Fin del sistema Misión Órbita.")
 
 
 main()
