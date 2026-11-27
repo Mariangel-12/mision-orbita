@@ -329,16 +329,48 @@ def regresar(recursos, dias_viaje, tripulantes):
 
     return resultado
 
-# Prueba temporal del componente D (se reemplaza al terminar el sistema)
+# ============================================================
+# COMPONENTE E: Reporte final ordenado
+# ============================================================
+
+# Devuelve los puntos de una fila de la bitácora; sirve como criterio de orden
+def obtener_puntos_actividad(fila):
+    puntos = fila[BIT_PUNTOS]
+    return puntos
+
+
+# Devuelve una matriz nueva ordenada de mayor a menor puntaje.
+# sorted() no modifica la bitácora original y conserva el orden original
+# entre filas con el mismo puntaje (por eso aparece primero la de menor número).
+def ordenar_bitacora(bitacora):
+    bitacora_ordenada = sorted(bitacora, key=obtener_puntos_actividad, reverse=True)
+    return bitacora_ordenada
+
+
+# Muestra el reporte final de la misión con su bitácora ordenada
+def mostrar_reporte(mision, bitacora):
+    print("=== REPORTE FINAL ===")
+    print("Misión:", mision[MIS_NOMBRE])
+    print("Destino:", mision[MIS_DESTINO])
+    print("Resultado:", mision[MIS_RESULTADO])
+    print("Puntos científicos:", mision[MIS_PUNTOS])
+    print("Bitácora de exploración (de mayor a menor puntaje):")
+    if len(bitacora) == 0:
+        print("Sin actividades registradas.")
+    else:
+        for fila in ordenar_bitacora(bitacora):
+            print("#" + str(fila[BIT_NUMERO]) + " " + fila[BIT_ACTIVIDAD]
+                  + " - " + str(fila[BIT_PUNTOS]) + " puntos")
+
+# Prueba temporal del componente E (se reemplaza al terminar el sistema)
 def main():
-    resultado = regresar([46, 18, 18, 8], 3, 2)
-    print("Resultado:", resultado)
+    bitacora = [[1, "Analizar terreno", 10], [2, "Recolectar muestra", 20]]
+    mostrar_reporte([1, "Explorador II", "Luna", "Regreso interrumpido", 30], bitacora)
 
-    resultado = regresar([46, 18, 10, 8], 3, 2)
-    print("Resultado:", resultado)
+    bitacora = [[1, "Sobrevolar la zona", 25], [2, "Sobrevolar la zona", 25]]
+    mostrar_reporte([2, "Explorador III", "Luna", "Tripulación varada", 50], bitacora)
 
-    resultado = regresar([16, 18, 24, 10], 3, 2)
-    print("Resultado:", resultado)
+    mostrar_reporte([3, "Explorador IV", "Luna", "No autorizada", 0], [])
 
 
 main()
